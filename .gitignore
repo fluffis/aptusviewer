@@ -185,3 +185,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+## Ignore sign settings ##
+/gradle.properties
