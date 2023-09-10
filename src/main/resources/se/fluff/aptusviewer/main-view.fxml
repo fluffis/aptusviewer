@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.fluff.aptusviewer.controllers.MainController">
+   <children>
+      <TextField fx:id="searchbox" onKeyTyped="#searchboxHandleKeyEvent" promptText="Search" />
+      <TableView fx:id="maintable" VBox.vgrow="ALWAYS" onKeyPressed="#handleOnKeyPressed">
+        <columns>
+          <TableColumn fx:id="customer" prefWidth="100.0" text="Customer" />
+            <TableColumn fx:id="objectname" prefWidth="75.0" text="Object" />
+            <TableColumn fx:id="floor" prefWidth="75.0" text="Floor" />
+            <TableColumn fx:id="address" prefWidth="75.0" text="Address" />
+            <TableColumn fx:id="firstname" prefWidth="75.0" text="Firstname" />
+            <TableColumn fx:id="surname" prefWidth="200.0" text="Lastname" />
+            <TableColumn fx:id="authorities" prefWidth="200.0" text="Authorities" />
+        </columns>
+      </TableView>
+   </children>
+</VBox>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane onKeyPressed="#handleOnKeyPressed" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.fluff.aptusviewer.controllers.UsersDialogViewController">
+   <content>
+       <VBox >
+           <TableView fx:id="table" >
+               <columns>
+                   <TableColumn fx:id="id" prefWidth="100.0" text="Id" />
+                   <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
+                   <TableColumn fx:id="code" prefWidth="75.0" text="Code" />
+                   <TableColumn fx:id="card" text="Card" />
+                   <TableColumn fx:id="authorities" prefWidth="700.0" text="Authorities" />
+                   <TableColumn fx:id="blocked" prefWidth="75.0" text="Blocked" />
+                   <TableColumn fx:id="start" prefWidth="75.0" text="Start" />
+                   <TableColumn fx:id="stop" prefWidth="75.0" text="Stop" />
+               </columns>
+           </TableView>
+           <Label fx:id="statuslabel"/>
+       </VBox>
+   </content>
+</DialogPane>
