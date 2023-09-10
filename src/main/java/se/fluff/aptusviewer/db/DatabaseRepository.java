@@ -156,8 +156,4 @@ public class DatabaseRepository {
         return authorities;
     }
 
-    public List<AptusTimezone> getTimezones() {
-        return null;
-    }
-
 }

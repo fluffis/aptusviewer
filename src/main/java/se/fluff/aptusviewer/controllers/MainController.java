@@ -2,31 +2,32 @@ package se.fluff.aptusviewer.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import se.fluff.aptusviewer.AptusViewerApplication;
+import se.fluff.aptusviewer.callbacks.RowFactoryCallback;
 import se.fluff.aptusviewer.db.DatabaseRepository;
+import se.fluff.aptusviewer.listeners.SearchboxChangeListener;
 import se.fluff.aptusviewer.models.db.Authority;
 import se.fluff.aptusviewer.models.db.User;
 import se.fluff.aptusviewer.models.gui.AptusRow;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
 
-    private ObservableList<AptusRow> tableRows;
+    private final ObservableList<AptusRow> tableRows = FXCollections.observableArrayList();
 
-    private List<AptusRow> allrows = new ArrayList<>();
+    private DatabaseRepository db;
 
     @FXML
     private TableView<AptusRow> maintable;
@@ -64,65 +65,30 @@ public class MainController implements Initializable {
         firstname.setCellValueFactory(new PropertyValueFactory<>("FirstName"));
         surname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         authorities.setCellValueFactory(new PropertyValueFactory<>("objectAuthorities"));
-        tableRows = FXCollections.observableArrayList();
-
-        maintable.setItems(tableRows);
-        maintable.setRowFactory(tv -> {
-            TableRow<AptusRow> tr = new TableRow<>();
-            tr.setOnMouseClicked(e -> {
-                if(e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {
-                    Dialog<UsersDialogViewController> dialog = new Dialog<>();
-                    FXMLLoader fxmlLoader = new FXMLLoader(AptusViewerApplication.class.getResource("users-dialog-view.fxml"));
-                    try {
-                        dialog.setTitle("Customer " + tr.getItem().getCustomer() + " (Id: " + tr.getItem().getCustomerId() + ")");
-                        dialog.setDialogPane(fxmlLoader.load());
-                        UsersDialogViewController controller = fxmlLoader.getController();
-                        controller.setUsers(tr.getItem().getUserList());
-
-                        dialog.show();
-                    }
-                    catch(Exception exception) {
-                        System.err.println("Could not load FXML/Dialog: " + exception.getMessage());
-                    }
-                }
-            });
-
-            return tr;
-        });
-
 
         try {
 
-            DatabaseRepository db = new DatabaseRepository(
+            this.db = new DatabaseRepository(
                     AptusViewerApplication.settings.getProperty("hostname", ""),
                     AptusViewerApplication.settings.getProperty("dbname", ""),
                     AptusViewerApplication.settings.getProperty("username", ""),
                     AptusViewerApplication.settings.getProperty("password", "")
-                    );
-            allrows = db.getVirtualAptusRows();
-            allrows.forEach(ao -> {
-
-                List<Authority> authorities = db.getAuthoritiesForObjectId(ao.getObjectId());
-                List<User> users = db.getUsersForCustomerId(ao.getCustomerId());
-                users.forEach(u -> {
-                    u.setUserAuthorities(db.getAuthoritiesForUserId(u.getId()));
-                });
-                ao.setUserList(users);
-                ao.setObjectAuthorities(authorities.stream().map(Authority::getShortName).collect(Collectors.joining(", ")));
-
-            });
-            filterRows();
+            );
+            refreshRows();
         }
         catch(Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
         }
 
-    }
+        FilteredList<AptusRow> filteredList = new FilteredList<>(tableRows, p -> true);
+        searchbox.textProperty().addListener(new SearchboxChangeListener(filteredList));
 
-    @FXML
-    private void searchboxHandleKeyEvent(KeyEvent event) {
-        filterRows();
+        SortedList<AptusRow> sortedList = new SortedList<>(filteredList);
+        sortedList.comparatorProperty().bind(maintable.comparatorProperty());
+
+        maintable.setItems(sortedList);
+        maintable.setRowFactory(new RowFactoryCallback());
 
     }
 
@@ -131,23 +97,31 @@ public class MainController implements Initializable {
         if(event.isControlDown() && event.getCode() == KeyCode.F) {
             searchbox.requestFocus();
         }
+        else if(event.isControlDown() && event.getCode() == KeyCode.R) {
+            refreshRows();
+        }
+        else if(event.getCode() == KeyCode.ESCAPE) {
+            searchbox.setText("");
+            searchbox.requestFocus();
+
+        }
     }
 
+    private void refreshRows() {
 
-    private void filterRows() {
-        String search = searchbox.getText().toLowerCase();
+        System.out.println("refreshRows");
         tableRows.clear();
-        if(search.length() > 0) {
-            allrows.forEach(row -> {
+        db.getVirtualAptusRows().forEach(ao -> {
 
-                if(row.getCustomer().toLowerCase().contains(search) || row.getObjectAuthorities().toLowerCase().contains(search) || row.getSurname().toLowerCase().contains(search)) {
-                    tableRows.add(row);
-                }
+            List<Authority> authorities = db.getAuthoritiesForObjectId(ao.getObjectId());
+            List<User> users = db.getUsersForCustomerId(ao.getCustomerId());
+            users.forEach(u -> {
+                u.setUserAuthorities(db.getAuthoritiesForUserId(u.getId()));
             });
-        }
-        else {
-            tableRows.addAll(allrows);
-        }
+            ao.setUserList(users);
+            ao.setObjectAuthorities(authorities.stream().map(Authority::getShortName).collect(Collectors.joining(", ")));
+            tableRows.add(ao);
+        });
 
     }
 

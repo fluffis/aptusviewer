@@ -46,7 +46,7 @@ public class UsersDialogViewController implements Initializable {
     @FXML
     private Label statuslabel;
 
-    private ObservableList<User> userList = FXCollections.observableArrayList();
+    private final ObservableList<User> userList = FXCollections.observableArrayList();
 
 
     @Override
