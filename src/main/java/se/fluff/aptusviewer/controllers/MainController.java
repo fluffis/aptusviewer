@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -19,6 +20,8 @@ import se.fluff.aptusviewer.models.db.User;
 import se.fluff.aptusviewer.models.gui.AptusRow;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -103,25 +106,60 @@ public class MainController implements Initializable {
         else if(event.getCode() == KeyCode.ESCAPE) {
             searchbox.setText("");
             searchbox.requestFocus();
+        }
+        else if(event.getCode() == KeyCode.DOWN) {
+            maintable.requestFocus();
+        }
+        else if(event.getCode() == KeyCode.ENTER) {
+            AptusRow aptusRow = maintable.getSelectionModel().getSelectedItem();
+            if(aptusRow != null) {
+                Dialog<UsersDialogViewController> dialog = new Dialog<>();
+                FXMLLoader fxmlLoader = new FXMLLoader(AptusViewerApplication.class.getResource("users-dialog-view.fxml"));
+                try {
+                    dialog.setTitle("Customer " + aptusRow.getCustomer() + " / " + aptusRow.getSurname() + " (Id: " + aptusRow.getCustomerId() + ")");
+                    dialog.setDialogPane(fxmlLoader.load());
+                    UsersDialogViewController controller = fxmlLoader.getController();
+                    controller.setUsers(aptusRow.getUserList());
 
+                    dialog.show();
+                }
+                catch(Exception exception) {
+                    System.err.println("Could not load FXML/Dialog: " + exception.getMessage());
+                }
+            }
         }
     }
 
     private void refreshRows() {
 
-        System.out.println("refreshRows");
-        tableRows.clear();
-        db.getVirtualAptusRows().forEach(ao -> {
+        List<AptusRow> rows = new ArrayList<>();
 
-            List<Authority> authorities = db.getAuthoritiesForObjectId(ao.getObjectId());
-            List<User> users = db.getUsersForCustomerId(ao.getCustomerId());
-            users.forEach(u -> {
-                u.setUserAuthorities(db.getAuthoritiesForUserId(u.getId()));
+        Thread taskThread = new Thread(() -> {
+            db.getVirtualAptusRows().forEach(ao -> {
+
+                List<Authority> authorities = db.getAuthoritiesForObjectId(ao.getObjectId());
+                List<User> users = db.getUsersForCustomerId(ao.getCustomerId());
+                users.forEach(u -> {
+                    u.setUserAuthorities(db.getAuthoritiesForUserId(u.getId())
+                            .stream()
+                            .sorted(Comparator.comparing(Authority::getShortName))
+                            .collect(Collectors.toList())
+                    );
+                });
+                ao.setUserList(users);
+                ao.setObjectAuthorities(authorities.stream()
+                        .map(Authority::getShortName)
+                        .sorted()
+                        .collect(Collectors.joining(", ")));
+
+                rows.add(ao);
             });
-            ao.setUserList(users);
-            ao.setObjectAuthorities(authorities.stream().map(Authority::getShortName).collect(Collectors.joining(", ")));
-            tableRows.add(ao);
+
+            tableRows.clear();
+            tableRows.addAll(rows);
         });
+
+        taskThread.start();
 
     }
 

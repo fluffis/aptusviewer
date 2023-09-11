@@ -22,7 +22,7 @@ public class RowFactoryCallback implements Callback<TableView<AptusRow>, TableRo
                 Dialog<UsersDialogViewController> dialog = new Dialog<>();
                 FXMLLoader fxmlLoader = new FXMLLoader(AptusViewerApplication.class.getResource("users-dialog-view.fxml"));
                 try {
-                    dialog.setTitle("Customer " + tr.getItem().getCustomer() + " (Id: " + tr.getItem().getCustomerId() + ")");
+                    dialog.setTitle("Customer " + tr.getItem().getCustomer() + " / " + tr.getItem().getSurname() + " (Id: " + tr.getItem().getCustomerId() + ")");
                     dialog.setDialogPane(fxmlLoader.load());
                     UsersDialogViewController controller = fxmlLoader.getController();
                     controller.setUsers(tr.getItem().getUserList());
