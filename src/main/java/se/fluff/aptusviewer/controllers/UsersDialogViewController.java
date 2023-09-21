@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -56,6 +57,29 @@ public class UsersDialogViewController implements Initializable {
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         code.setCellValueFactory(new PropertyValueFactory<>("code"));
         card.setCellValueFactory(new PropertyValueFactory<>("card"));
+
+        card.setCellFactory(factory -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty || getTableRow() == null) {
+                    setText(null);
+                    setGraphic(null);
+                }
+                else {
+                    setText(item);
+                    User user = getTableRow().getItem();
+                    if(user != null) {
+                        if(user.isBlocked()) {
+                            setStyle("-fx-background-color: #ff0000;");
+                        }
+                        else {
+                            setStyle("");
+                        }
+                    }
+                }
+            }
+        });
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
         stop.setCellValueFactory(new PropertyValueFactory<>("stop"));
         blocked.setCellValueFactory(new PropertyValueFactory<>("blocked"));
