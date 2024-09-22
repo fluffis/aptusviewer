@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<DialogPane onKeyPressed="#handleOnKeyPressed" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.fluff.aptusviewer.controllers.UsersDialogViewController">
+<DialogPane onKeyPressed="#handleOnKeyPressed" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.fluff.aptusviewer.controllers.UsersDialogViewController">
    <content>
-       <VBox >
-           <TableView fx:id="table" >
+       <VBox>
+           <TableView fx:id="table">
                <columns>
                    <TableColumn fx:id="id" prefWidth="100.0" text="Id" />
                    <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
@@ -17,17 +18,24 @@
                    <TableColumn fx:id="start" prefWidth="75.0" text="Start" />
                    <TableColumn fx:id="stop" prefWidth="75.0" text="Stop" />
                </columns>
+            <VBox.margin>
+               <Insets bottom="30.0" />
+            </VBox.margin>
+            <padding>
+               <Insets bottom="30.0" />
+            </padding>
            </TableView>
-           <TableView fx:id="logtable" >
+           <TableView fx:id="logtable" VBox.vgrow="ALWAYS">
                <columns>
                    <TableColumn fx:id="logid" text="Id" />
                    <TableColumn fx:id="logeventtime" prefWidth="180.0" text="Event Time" />
+                   <TableColumn fx:id="logevent" prefWidth="140.0" text="Event" />
                    <TableColumn fx:id="logname" prefWidth="250.0" text="Entity" />
                    <TableColumn fx:id="logactivatorname" prefWidth="100.0" text="Card" />
                    <TableColumn fx:id="logcontrol" prefWidth="230.0" text="Control" />
                </columns>
            </TableView>
-           <Label fx:id="statuslabel"/>
+           <Label fx:id="statuslabel" />
        </VBox>
    </content>
 </DialogPane>

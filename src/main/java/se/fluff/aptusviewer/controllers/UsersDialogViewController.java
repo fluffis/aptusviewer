@@ -20,6 +20,7 @@ import se.fluff.aptusviewer.models.db.AptusControl;
 import se.fluff.aptusviewer.models.db.AptusEvent;
 import se.fluff.aptusviewer.models.db.AptusSystem;
 import se.fluff.aptusviewer.models.db.User;
+import se.fluff.aptusviewer.models.gui.AptusEventName;
 
 import java.net.URL;
 import java.util.*;
@@ -58,6 +59,9 @@ public class UsersDialogViewController implements Initializable {
 
     @FXML
     private TableColumn<AptusEvent, Date> logeventtime;
+
+    @FXML
+    private TableColumn<AptusEvent, String> logevent;
 
     @FXML
     private TableColumn<AptusEvent, String> logname;
@@ -113,6 +117,7 @@ public class UsersDialogViewController implements Initializable {
 
         logid.setCellValueFactory(new PropertyValueFactory<>("id"));
         logeventtime.setCellValueFactory(new PropertyValueFactory<>("eventTime"));
+        logevent.setCellValueFactory(param -> new SimpleStringProperty(AptusEventName.get(param.getValue().getEventNo())));
         logname.setCellValueFactory(new PropertyValueFactory<>("shortName"));
         logactivatorname.setCellValueFactory(new PropertyValueFactory<>("activatorName"));
         logcontrol.setCellValueFactory(param -> new SimpleStringProperty(controls.get(param.getValue().getControlId()).getShortName()));
