@@ -11,11 +11,20 @@
                    <TableColumn fx:id="id" prefWidth="100.0" text="Id" />
                    <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
                    <TableColumn fx:id="code" prefWidth="75.0" text="Code" />
-                   <TableColumn fx:id="card" text="Card" />
+                   <TableColumn fx:id="card" prefWidth="100.0" text="Card" />
                    <TableColumn fx:id="authorities" prefWidth="700.0" text="Authorities" />
                    <TableColumn fx:id="blocked" prefWidth="75.0" text="Blocked" />
                    <TableColumn fx:id="start" prefWidth="75.0" text="Start" />
                    <TableColumn fx:id="stop" prefWidth="75.0" text="Stop" />
+               </columns>
+           </TableView>
+           <TableView fx:id="logtable" >
+               <columns>
+                   <TableColumn fx:id="logid" text="Id" />
+                   <TableColumn fx:id="logeventtime" prefWidth="180.0" text="Event Time" />
+                   <TableColumn fx:id="logname" prefWidth="250.0" text="Entity" />
+                   <TableColumn fx:id="logactivatorname" prefWidth="100.0" text="Card" />
+                   <TableColumn fx:id="logcontrol" prefWidth="230.0" text="Control" />
                </columns>
            </TableView>
            <Label fx:id="statuslabel"/>

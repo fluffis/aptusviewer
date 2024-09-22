@@ -1,5 +1,6 @@
 package se.fluff.aptusviewer.models.gui;
 
+import se.fluff.aptusviewer.models.db.AptusEvent;
 import se.fluff.aptusviewer.models.db.User;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class AptusRow {
     private String objectAuthorities;
 
     private List<User> userList = new ArrayList<>();
+    private List<AptusEvent>events = new ArrayList<>();
 
     public long getObjectId() {
         return objectId;
@@ -108,6 +110,14 @@ public class AptusRow {
 
     public void setUserList(List<User> userList) {
         this.userList = userList;
+    }
+
+    public List<AptusEvent> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<AptusEvent> events) {
+        this.events = events;
     }
 
     @Override

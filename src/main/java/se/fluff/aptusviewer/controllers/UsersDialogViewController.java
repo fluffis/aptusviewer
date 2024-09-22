@@ -1,5 +1,6 @@
 package se.fluff.aptusviewer.controllers;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,11 +16,13 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import se.fluff.aptusviewer.models.db.AptusControl;
+import se.fluff.aptusviewer.models.db.AptusEvent;
+import se.fluff.aptusviewer.models.db.AptusSystem;
 import se.fluff.aptusviewer.models.db.User;
 
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class UsersDialogViewController implements Initializable {
 
@@ -47,7 +50,29 @@ public class UsersDialogViewController implements Initializable {
     @FXML
     private Label statuslabel;
 
+    @FXML
+    private TableView<AptusEvent> logtable;
+
+    @FXML
+    private TableColumn<AptusEvent, String> logid;
+
+    @FXML
+    private TableColumn<AptusEvent, Date> logeventtime;
+
+    @FXML
+    private TableColumn<AptusEvent, String> logname;
+
+    @FXML
+    private TableColumn<AptusEvent, String> logactivatorname;
+
+    @FXML
+    private TableColumn<AptusEvent, String> logcontrol;
+
+
     private final ObservableList<User> userList = FXCollections.observableArrayList();
+    private final ObservableList<AptusEvent> events = FXCollections.observableArrayList();
+    private Map<Integer, AptusSystem> systems = new HashMap<>();
+    private Map<Integer, AptusControl> controls = new HashMap<>();
 
 
     @Override
@@ -86,6 +111,13 @@ public class UsersDialogViewController implements Initializable {
         authorities.setCellValueFactory(new PropertyValueFactory<>("authorities"));
         table.setItems(userList);
 
+        logid.setCellValueFactory(new PropertyValueFactory<>("id"));
+        logeventtime.setCellValueFactory(new PropertyValueFactory<>("eventTime"));
+        logname.setCellValueFactory(new PropertyValueFactory<>("shortName"));
+        logactivatorname.setCellValueFactory(new PropertyValueFactory<>("activatorName"));
+        logcontrol.setCellValueFactory(param -> new SimpleStringProperty(controls.get(param.getValue().getControlId()).getShortName()));
+        logtable.setItems(events);
+
     }
 
     @FXML
@@ -112,5 +144,15 @@ public class UsersDialogViewController implements Initializable {
     public void setUsers(List<User> users) {
         userList.clear();
         userList.addAll(users);
+    }
+
+    public void setEvents(List<AptusEvent> eventlist) {
+        events.clear();
+        events.addAll(eventlist);
+    }
+
+    public void setLookupMaps(Map<Integer, AptusSystem> systems, Map<Integer, AptusControl> controls) {
+        this.systems = systems;
+        this.controls = controls;
     }
 }

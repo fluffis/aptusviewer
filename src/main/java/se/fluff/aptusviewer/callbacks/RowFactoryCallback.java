@@ -8,11 +8,24 @@ import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 import se.fluff.aptusviewer.AptusViewerApplication;
 import se.fluff.aptusviewer.controllers.UsersDialogViewController;
+import se.fluff.aptusviewer.models.db.AptusControl;
+import se.fluff.aptusviewer.models.db.AptusSystem;
 import se.fluff.aptusviewer.models.gui.AptusRow;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class RowFactoryCallback implements Callback<TableView<AptusRow>, TableRow<AptusRow>> {
+
+    private Map<Integer, AptusSystem> systems;
+    private Map<Integer, AptusControl> controls;
+
+    public RowFactoryCallback(Map<Integer, AptusSystem> systems, Map<Integer, AptusControl> controls) {
+        this.systems = systems;
+        this.controls = controls;
+    }
+
     @Override
     public TableRow<AptusRow> call(TableView<AptusRow> tableView) {
 
@@ -26,7 +39,8 @@ public class RowFactoryCallback implements Callback<TableView<AptusRow>, TableRo
                     dialog.setDialogPane(fxmlLoader.load());
                     UsersDialogViewController controller = fxmlLoader.getController();
                     controller.setUsers(tr.getItem().getUserList());
-
+                    controller.setEvents(tr.getItem().getEvents());
+                    controller.setLookupMaps(systems, controls);
                     dialog.show();
                 }
                 catch(Exception exception) {

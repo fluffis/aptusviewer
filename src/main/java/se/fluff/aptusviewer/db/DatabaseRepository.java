@@ -8,7 +8,10 @@ import se.fluff.aptusviewer.models.gui.AptusRow;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DatabaseRepository {
 
@@ -154,6 +157,61 @@ public class DatabaseRepository {
 
         }
         return authorities;
+    }
+
+    public List<AptusEvent> getEventsForCustomerId(long customerId) {
+        List<AptusEvent> events = new ArrayList<>();
+        ResultSetHandler<List<AptusEvent>> h = new EventListHandler();
+
+        if(this.open()) {
+            QueryRunner run = new QueryRunner();
+            try {
+                events = run.query(this.connection, "SELECT * FROM Event WHERE Customer_Id = ?", h, customerId);
+            }
+            catch(SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return events;
+    }
+
+    public Map<Integer, AptusControl> getControls() {
+        Map<Integer, AptusControl> controls = new HashMap<>();
+        ResultSetHandler<List<AptusControl>> h = new ControlListHandler();
+
+        if(this.open()) {
+            QueryRunner run = new QueryRunner();
+            try {
+                controls = run.query(this.connection, "SELECT * FROM Control", h)
+                        .stream()
+                        .collect(Collectors.toMap(AptusControl::getId, c -> c));
+            }
+            catch(SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return controls;
+    }
+
+    public Map<Integer, AptusSystem> getSystems() {
+        Map<Integer, AptusSystem> systems = new HashMap<>();
+        ResultSetHandler<List<AptusSystem>> h = new AptusSystemListHandler();
+
+        if(this.open()) {
+            QueryRunner run = new QueryRunner();
+            try {
+                systems = run.query(this.connection, "SELECT * FROM System", h)
+                        .stream()
+                        .collect(Collectors.toMap(AptusSystem::getId, c -> c));
+            }
+            catch(SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return systems;
     }
 
 }

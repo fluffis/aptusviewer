@@ -15,15 +15,11 @@ import se.fluff.aptusviewer.AptusViewerApplication;
 import se.fluff.aptusviewer.callbacks.RowFactoryCallback;
 import se.fluff.aptusviewer.db.DatabaseRepository;
 import se.fluff.aptusviewer.listeners.SearchboxChangeListener;
-import se.fluff.aptusviewer.models.db.Authority;
-import se.fluff.aptusviewer.models.db.User;
+import se.fluff.aptusviewer.models.db.*;
 import se.fluff.aptusviewer.models.gui.AptusRow;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
@@ -31,6 +27,9 @@ public class MainController implements Initializable {
     private final ObservableList<AptusRow> tableRows = FXCollections.observableArrayList();
 
     private DatabaseRepository db;
+
+    private Map<Integer, AptusControl> controls;
+    private Map<Integer, AptusSystem> systems;
 
     @FXML
     private TableView<AptusRow> maintable;
@@ -78,6 +77,9 @@ public class MainController implements Initializable {
                     AptusViewerApplication.settings.getProperty("password", "")
             );
             refreshRows();
+            this.controls = db.getControls();
+            this.systems = db.getSystems();
+
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -91,7 +93,7 @@ public class MainController implements Initializable {
         sortedList.comparatorProperty().bind(maintable.comparatorProperty());
 
         maintable.setItems(sortedList);
-        maintable.setRowFactory(new RowFactoryCallback());
+        maintable.setRowFactory(new RowFactoryCallback(systems, controls));
 
     }
 
@@ -120,6 +122,8 @@ public class MainController implements Initializable {
                     dialog.setDialogPane(fxmlLoader.load());
                     UsersDialogViewController controller = fxmlLoader.getController();
                     controller.setUsers(aptusRow.getUserList());
+                    controller.setEvents(aptusRow.getEvents());
+                    controller.setLookupMaps(systems, controls);
 
                     dialog.show();
                 }
@@ -139,6 +143,7 @@ public class MainController implements Initializable {
 
                 List<Authority> authorities = db.getAuthoritiesForObjectId(ao.getObjectId());
                 List<User> users = db.getUsersForCustomerId(ao.getCustomerId());
+                List<AptusEvent> events = db.getEventsForCustomerId(ao.getCustomerId());
                 users.forEach(u -> {
                     u.setUserAuthorities(db.getAuthoritiesForUserId(u.getId())
                             .stream()
@@ -147,6 +152,7 @@ public class MainController implements Initializable {
                     );
                 });
                 ao.setUserList(users);
+                ao.setEvents(events);
                 ao.setObjectAuthorities(authorities.stream()
                         .map(Authority::getShortName)
                         .sorted()
